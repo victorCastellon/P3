@@ -10,12 +10,14 @@ using namespace std;
 namespace upc {
   void PitchAnalyzer::autocorrelation(const vector<float> &x, vector<float> &r) const {
 
-    for (unsigned int l = 0; l < r.size(); ++l) {
-  		/// \TODO Compute the autocorrelation r[l]
-    }
-
-    if (r[0] == 0.0F) //to avoid log() and divide zero 
-      r[0] = 1e-10; 
+    for (unsigned int l = 0; l < r.size(); ++l) {	
+    	r[l] = 0;
+     	for(unsigned int n = l; n < x.size(); n++){
+      	r[l] += x[n]*x[n-l]; 
+      }
+    	r[l] /= x.size();}
+		  if (r[0] == 0.0F) //to avoid log() and divide zero 
+     		r[0] = 1e-10;
   }
 
   void PitchAnalyzer::set_window(Window win_type) {
