@@ -9,7 +9,13 @@ using namespace std;
 /// Name space of UPC
 namespace upc {
   void PitchAnalyzer::autocorrelation(const vector<float> &x, vector<float> &r) const {
-
+    /// \TODO Compute the autocorrelation
+    /// \FET Autocorrelation computed
+    /// - Inicializamos la autocorrelacion a 0
+    /// - Añadimos el producto
+    /// - Dividimos por la duración
+    ///
+    /// *** TACHAAAAAN ***
     for (unsigned int l = 0; l < r.size(); ++l) {	
     	r[l] = 0;
      	for(unsigned int n = l; n < x.size(); n++){
@@ -29,6 +35,10 @@ namespace upc {
     switch (win_type) {
     case HAMMING:
       /// \TODO Implement the Hamming window
+      /// \FET
+      for(i=0;i<frameLen;i++){
+        window[i]=a0 - a1*cos((2*M_PI*i)/(frameLen-1));
+      }
       break;
     case RECT:
     default:
@@ -57,7 +67,8 @@ namespace upc {
               - Relación R[1]/R[0] < 0,53
               - Relación R[Npitch]/R[0] < 0,37
     */
-   	return pot < -73 or r1norm < 0.53 or rmaxnorm < 0.37;
+   	//return pot < -73 or r1norm < 0.53 or rmaxnorm < 0.37;
+    return pot < -73 or r1norm < 0.53 or rmaxnorm < umaxnorm;
   }
 
   float PitchAnalyzer::compute_pitch(vector<float> & x) const {
@@ -80,9 +91,9 @@ namespace upc {
 	/// Choices to set the minimum value of the lag are:
 	///    - The first negative value of the autocorrelation.
 	///    - The lag corresponding to the maximum value of the pitch.
+  /// In either case, the lag should not exceed that of the minimum value of the pitch.
+  /// \FET
     ///	   .
-	/// In either case, the lag should not exceed that of the minimum value of the pitch.
-
     for(iR=iRMax=r.begin()+npitch_min;iR<r.begin()+npitch_max;iR++){
    	  if(*iR>*iRMax) iRMax=iR;
   	}
