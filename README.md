@@ -46,9 +46,10 @@ Ejercicios básicos
    * Implemente la regla de decisión sonoro o sordo e inserte el código correspondiente.
    
    Para que un sonido sea considerado sonoro decimos que se debe cumplir una de estas condiciones:
-              - Potencia < -73 dB
-              - Relación R[1]/R[0] < 0,53
-              - Relación R[Npitch]/R[0] < 0,37
+        
+	1. Potencia < -73 dB
+        2. Relación R[1]/R[0] < 0,53
+        3. Relación R[Npitch]/R[0] < 0,37
               
   		 bool PitchAnalyzer::unvoiced(float pot, float r1norm, float rmaxnorm) const {
 			return pot < -73 or r1norm < 0.53 or rmaxnorm < 0.37;
