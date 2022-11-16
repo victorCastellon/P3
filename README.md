@@ -15,7 +15,7 @@ Ejercicios básicos
 
    * Complete el cálculo de la autocorrelación e inserte a continuación el código correspondiente.
    
-   void PitchAnalyzer::autocorrelation(const vector<float> &x, vector<float> &r) const {
+  		 void PitchAnalyzer::autocorrelation(const vector<float> &x, vector<float> &r) const {
    	 		for (unsigned int l = 0; l < r.size(); ++l) {	
     	 		 r[l] = 0;
      	 		for(unsigned int n = l; n < x.size(); n++){
@@ -36,8 +36,26 @@ Ejercicios básicos
 
    * Determine el mejor candidato para el periodo de pitch localizando el primer máximo secundario de la
      autocorrelación. Inserte a continuación el código correspondiente.
+     		
+		for(iR=iRMax=r.begin()+npitch_min;iR<r.begin()+npitch_max;iR++){
+          		if(*iR>*iRMax) iRMax=iR;
+        	}
+
+    		unsigned int lag = iRMax - r.begin();
+
+  		float pot = 10 * log10(r[0]);
 
    * Implemente la regla de decisión sonoro o sordo e inserte el código correspondiente.
+   
+   Para que un sonido sea considerado sonoro decimos que se debe cumplir una de estas condiciones:
+              - Potencia < -73 dB
+              - Relación R[1]/R[0] < 0,53
+              - Relación R[Npitch]/R[0] < 0,37
+              
+  		 bool PitchAnalyzer::unvoiced(float pot, float r1norm, float rmaxnorm) const {
+   		 	
+			return pot < -73 or r1norm < 0.53 or rmaxnorm < 0.37;
+  		 }
 
    * Puede serle útil seguir las instrucciones contenidas en el documento adjunto `código.pdf`.
 
