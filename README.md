@@ -15,24 +15,47 @@ Ejercicios básicos
 
    * Complete el cálculo de la autocorrelación e inserte a continuación el código correspondiente.
    
-   		<img src="autocorr.jpg" width="640" align="center">
-   
+  		 void PitchAnalyzer::autocorrelation(const vector<float> &x, vector<float> &r) const {
+   	 		for (unsigned int l = 0; l < r.size(); ++l) {	
+    	 		 r[l] = 0;
+     	 		for(unsigned int n = l; n < x.size(); n++){
+      	 		 r[l] += x[n]*x[n-l]; 
+      			}
+    	  		r[l] /= x.size();}
+		     if (r[0] == 0.0F) //to avoid log() and divide zero 
+     		 r[0] = 1e-10; 
+ 		 }
+
+
    * Inserte una gŕafica donde, en un *subplot*, se vea con claridad la señal temporal de un segmento de
      unos 30 ms de un fonema sonoro y su periodo de pitch; y, en otro *subplot*, se vea con claridad la
 	 autocorrelación de la señal y la posición del primer máximo secundario.
 
 	 NOTA: es más que probable que tenga que usar Python, Octave/MATLAB u otro programa semejante para
 	 hacerlo. Se valorará la utilización de la biblioteca matplotlib de Python.
+	 
+	 <img src="img/correlation.png" width="640" align="center">
 
    * Determine el mejor candidato para el periodo de pitch localizando el primer máximo secundario de la
      autocorrelación. Inserte a continuación el código correspondiente.
-     
-     	<img src="Max_1.jpg" width="640" align="center">
-		<img src="Max_2.jpg" width="640" align="center">
-     
+     		
+  		 for (iR=iRMax=r.begin()+npitch_min;iR<r.begin()+npitch_max;iR++){
+  		 	if(*iR>*iRMax) iRMax=iR;
+  		 }
+  		 unsigned int lag = iRMax - r.begin();
+  		 float pot = 10 * log10(r[0]);
+
    * Implemente la regla de decisión sonoro o sordo e inserte el código correspondiente.
    
-   		<img src="Sonoro_Sordo.jpg" width="640" align="center">
+   Para que un sonido sea considerado sonoro decimos que se debe cumplir una de estas condiciones:
+   
+   + Potencia < -73 dB
+   + Relación R[1]/R[0] < 0,53
+   + Relación R[Npitch]/R[0] < 0,37
+              
+  		 bool PitchAnalyzer::unvoiced(float pot, float r1norm, float rmaxnorm) const {
+			return pot < -73 or r1norm < 0.53 or rmaxnorm < 0.37;
+  		 }
 
    * Puede serle útil seguir las instrucciones contenidas en el documento adjunto `código.pdf`.
 
@@ -51,6 +74,8 @@ Ejercicios básicos
 
 	    Recuerde configurar los paneles de datos para que el desplazamiento de ventana sea el adecuado, que
 		en esta práctica es de 15 ms.
+		
+		<img src="img/pitch.png" width="640" align="center">
 
       - Use el estimador de pitch implementado en el programa `wavesurfer` en una señal de prueba y compare
 	    su resultado con el obtenido por la mejor versión de su propio sistema.  Inserte una gráfica
