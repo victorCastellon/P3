@@ -14,7 +14,7 @@ Ejercicios básicos
   `get_pitch`.
 
    * Complete el cálculo de la autocorrelación e inserte a continuación el código correspondiente.
-   
+   ```c++
   		 void PitchAnalyzer::autocorrelation(const vector<float> &x, vector<float> &r) const {
    	 		for (unsigned int l = 0; l < r.size(); ++l) {	
     	 		 r[l] = 0;
@@ -25,7 +25,7 @@ Ejercicios básicos
 		     if (r[0] == 0.0F) //to avoid log() and divide zero 
      		 r[0] = 1e-10; 
  		 }
-
+   ```
 
    * Inserte una gŕafica donde, en un *subplot*, se vea con claridad la señal temporal de un segmento de
      unos 30 ms de un fonema sonoro y su periodo de pitch; y, en otro *subplot*, se vea con claridad la
@@ -34,17 +34,17 @@ Ejercicios básicos
 	 NOTA: es más que probable que tenga que usar Python, Octave/MATLAB u otro programa semejante para
 	 hacerlo. Se valorará la utilización de la biblioteca matplotlib de Python.
 	 
-	 <img src="img/correlation.png" width="640" align="center">
+	 <img src="img/rl014_autocorrelation.png" width="640" align="center">
 
    * Determine el mejor candidato para el periodo de pitch localizando el primer máximo secundario de la
      autocorrelación. Inserte a continuación el código correspondiente.
-     		
+     ```c++		
   		 for (iR=iRMax=r.begin()+npitch_min;iR<r.begin()+npitch_max;iR++){
   		 	if(*iR>*iRMax) iRMax=iR;
   		 }
   		 unsigned int lag = iRMax - r.begin();
   		 float pot = 10 * log10(r[0]);
-
+     ```
    * Implemente la regla de decisión sonoro o sordo e inserte el código correspondiente.
    
    Para que un sonido sea considerado sonoro decimos que se debe cumplir una de estas condiciones:
@@ -52,11 +52,11 @@ Ejercicios básicos
    + Potencia < -73 dB
    + Relación R[1]/R[0] < 0,53
    + Relación R[Npitch]/R[0] < 0,37
-              
+    ```c++          
   		 bool PitchAnalyzer::unvoiced(float pot, float r1norm, float rmaxnorm) const {
 			return pot < -73 or r1norm < 0.53 or rmaxnorm < 0.37;
   		 }
-
+    ```
    * Puede serle útil seguir las instrucciones contenidas en el documento adjunto `código.pdf`.
 
 - Una vez completados los puntos anteriores, dispondrá de una primera versión del estimador de pitch. El 
