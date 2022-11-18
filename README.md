@@ -38,14 +38,31 @@ Ejercicios básicos
 
    * Determine el mejor candidato para el periodo de pitch localizando el primer máximo secundario de la
      autocorrelación. Inserte a continuación el código correspondiente.
-    
-     ```c++		
-	for (iR=iRMax=r.begin()+npitch_min;iR<r.begin()+npitch_max;iR++){
-		if(*iR>*iRMax) iRMax=iR;
-	}
-	unsigned int lag = iRMax - r.begin();
-	float pot = 10 * log10(r[0]);
-     ```
+     Como se puede observar en la imagen superior, el mejor candidato para el periodo de pitch es 4.8125ms. Este valor puede localizarse perfectamente en ambos dominios, pues en la gráfica temporal se aprecia claramente que cada periodo ocupa aproximadamente 5s, y en el dominio de la autocorrelación se distingue claramente el máximo, obteniendo el valor gracias al código realizado con Python mostrado a continuación.
+
+     Código utilizado para el cálculo de la autocorrelación y su máximo fuera del origen.
+
+     ```python
+      corr = np.correlate(data,data,'full') / len(data)
+      corr = corr[int(corr.size/2):]
+
+      min_index = np.argmin(corr)
+      max_index = np.argmax(corr[min_index:])
+      max_value = np.max(corr[min_index:])
+      fig, axs = plt.subplots(2)
+      
+      axs[0].plot(t, data)
+      axs[1].plot(t, corr)
+      axs[1].plot((min_index+max_index)*1000/samplerate,max_value,'ro', label='Temporal index = {}ms'.format((min_index+max_index)*1000/samplerate)) #MOSTRAR EL MÁXIMO DE LA AUTOCORRELACIÓN
+
+      axs[0].set_title('Voiced frame')
+      axs[1].set_title('Voiced frame autocorrelation')
+      axs[1].set_xlabel('time (ms)')
+      axs[1].legend()
+
+      fig.tight_layout()
+      plt.show()
+      ```
      
    * Implemente la regla de decisión sonoro o sordo e inserte el código correspondiente.
    
