@@ -40,7 +40,7 @@ Ejercicios básicos
      autocorrelación. Inserte a continuación el código correspondiente.
     
      ```c++		
-	for(iR=iRMax=r.begin()+npitch_min;iR<r.begin()+npitch_max;iR++){
+	for (iR=iRMax=r.begin()+npitch_min;iR<r.begin()+npitch_max;iR++){
 		if(*iR>*iRMax) iRMax=iR;
 	}
 	unsigned int lag = iRMax - r.begin();
