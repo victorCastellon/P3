@@ -14,6 +14,7 @@ Ejercicios básicos
   `get_pitch`.
 
    * Complete el cálculo de la autocorrelación e inserte a continuación el código correspondiente.
+
       ```c++
       for (unsigned int l = 0; l < r.size(); ++l) {
         r[l] = 0;
@@ -34,48 +35,38 @@ Ejercicios básicos
 
 	 NOTA: es más que probable que tenga que usar Python, Octave/MATLAB u otro programa semejante para
 	 hacerlo. Se valorará la utilización de la biblioteca matplotlib de Python.
-	 
-	 <img src="img/rl014_autocorrelation.png" width="640" align="center">
 
+   La siguiente imagen ha sido generada con el siguiente script [plot_autocorrelation.py](plot_autocorrelation.py).
+
+      <img src="imgs/autocorrelation.jpg" width="640" align="center">
+  
    * Determine el mejor candidato para el periodo de pitch localizando el primer máximo secundario de la
      autocorrelación. Inserte a continuación el código correspondiente.
-     
-     Como se puede observar en la imagen superior, el mejor candidato para el periodo de pitch es 4.8125ms. Este valor puede localizarse perfectamente en ambos dominios, pues en la gráfica temporal se aprecia claramente que cada periodo ocupa aproximadamente 5s, y en el dominio de la autocorrelación se distingue claramente el máximo, obteniendo el valor gracias al código realizado con Python mostrado a continuación.
 
-     Código utilizado para el cálculo de la autocorrelación y su máximo fuera del origen.
+     4.8125 ms es el mejor candidato. Dicho valor lo hemos obtenido con el siguiente codigo en Python.
 
-     ```python
-      corr = np.correlate(data,data,'full') / len(data)
-      corr = corr[int(corr.size/2):]
+     Código utilizado para el cálculo de la autocorrelación y su máximo fuera del origen:
 
-      min_index = np.argmin(corr)
-      max_index = np.argmax(corr[min_index:])
-      max_value = np.max(corr[min_index:])
-      fig, axs = plt.subplots(2)
+     ```c++
+      for(iR = iRMax =  r.begin() + npitch_min; iR < r.begin() + npitch_max; iR++){ 
+      if(*iR > * iRMax) iRMax = iR;
+      }
+
+     ```
+
       
-      axs[0].plot(t, data)
-      axs[1].plot(t, corr)
-      axs[1].plot((min_index+max_index)*1000/samplerate,max_value,'ro', label='Temporal index = {}ms'.format((min_index+max_index)*1000/samplerate)) #MOSTRAR EL MÁXIMO DE LA AUTOCORRELACIÓN
 
-      axs[0].set_title('Voiced frame')
-      axs[1].set_title('Voiced frame autocorrelation')
-      axs[1].set_xlabel('time (ms)')
-      axs[1].legend()
-
-      fig.tight_layout()
-      plt.show()
-      ```
-     
    * Implemente la regla de decisión sonoro o sordo e inserte el código correspondiente.
    
-     La regla de decisión se ha basado en 3 parámetros: la autocorrelación, la relación R(1)/R(0) y el valor de la potencia.
+      La regla de decisión se ha basado en 3 parámetros:
+      + la autocorrelación
+      + la relación R(1)/R(0)
+      + el valor de la potencia.
 
       ```c++
       if(rmaxnorm>umaxnorm && r1norm > r1thr && pot > powthr) return false;
       return true;
       ```
-    
-   * Puede serle útil seguir las instrucciones contenidas en el documento adjunto `código.pdf`.
 
 - Una vez completados los puntos anteriores, dispondrá de una primera versión del estimador de pitch. El 
   resto del trabajo consiste, básicamente, en obtener las mejores prestaciones posibles con él.
@@ -92,19 +83,41 @@ Ejercicios básicos
 
 	    Recuerde configurar los paneles de datos para que el desplazamiento de ventana sea el adecuado, que
 		en esta práctica es de 15 ms.
-		
-		<img src="img/pitch.png" width="640" align="center">
+
+        <img src="imgs/analisis.png" width="640" align="center">
+
+        <img src="imgs/wave.png" width="640" align="center">
+       
+        Las gráficas hacen referencia a:
+        + al nivel de potencia de la señal (r[0])
+        + la autocorrelación normalizada de uno (r1norm = r[1] / r[0])
+        + el valor de la autocorrelación en su máximo secundario (rmaxnorm = r[lag] / r[0])
+        + el estimador de pitch implementado en el programa wavesurfer 
+        
+        respectivamente.
+        
+        Observamos que valores altos de estos parámetros corresponden a tramos sonoros.
 
       - Use el estimador de pitch implementado en el programa `wavesurfer` en una señal de prueba y compare
 	    su resultado con el obtenido por la mejor versión de su propio sistema.  Inserte una gráfica
 		ilustrativa del resultado de ambos estimadores.
-     
-		Aunque puede usar el propio Wavesurfer para obtener la representación, se valorará
-	 	el uso de alternativas de mayor calidad (particularmente Python).
-  
+
+    	Aunque puede usar el propio Wavesurfer para obtener la representación, se valorará el uso de alternativas de mayor calidad (particularmente Python).
+
+		<img src="imgs/pitch_compare.png" width="640" align="center">
+
+      El contorno del pitch obtenido por nosotros y el de wavesurfer son prácticamente iguales. Por lo tanto podemos constatar que es bastante preciso.
+ 
+      El grafico lo hemos obtenido mediante el siguiente script en python: [pitch_plot.py](pitch_plot.py)
+
+ 
   * Optimice los parámetros de su sistema de estimación de pitch e inserte una tabla con las tasas de error
     y el *score* TOTAL proporcionados por `pitch_evaluate` en la evaluación de la base de datos 
 	`pitch_db/train`..
+  
+    <img src="imgs/total.png" width="640" align="center">
+
+    Nota: Hemos implementado el método de la ventana de Hamming pero finalmente hemos optado por utilizar la ventana rectangular, ya que nos da un mejor resultado.
 
 Ejercicios de ampliación
 ------------------------
@@ -118,6 +131,8 @@ Ejercicios de ampliación
 
   * Inserte un *pantallazo* en el que se vea el mensaje de ayuda del programa y un ejemplo de utilización
     con los argumentos añadidos.
+    
+    <img src="imgs/docopt.png" width="640" align="center">
 
 - Implemente las técnicas que considere oportunas para optimizar las prestaciones del sistema de estimación
   de pitch.
@@ -142,7 +157,41 @@ Ejercicios de ampliación
   También se valorará la realización de un estudio de los parámetros involucrados. Por ejemplo, si se opta
   por implementar el filtro de mediana, se valorará el análisis de los resultados obtenidos en función de
   la longitud del filtro.
-   
+
+  Se han implementado dos mejoras: un filtro de center-clipping y un filtro de mediana.
+
+  **Center Clipping sin offset**
+
+  El filtro se adapta segun la potencia máxima de la señal.
+  Sin offset obtenemos mejores resultados.
+
+  ``` c++
+  float max = *std::max_element(x.begin(), x.end());
+  for(int i = 0; i < (int)x.size(); i++) {
+    if(abs(x[i]) < cclip1*max) {
+      x[i] = 0.0F;
+    } 
+  }
+  ```
+   **Filtro de Mediana**
+
+  El filtro de mediana trabaja mejor con 3 valores ya que hay fragmentos sonoros de la trama que son muy cortos. Por lo tanto, para que tenga efecto en ese caso es mejor comparar con muestras contiguas.
+
+
+  ``` c++
+  vector<float> f0_final(f0.size());
+  vector<float> temp(3);
+  int i;
+  for(i = 1; i < (int)(f0.size() - 1); i++) {
+    temp = {f0[i-1], f0[i], f0[i+1]};
+    auto m = temp.begin() + temp.size()/2;
+    std::nth_element(temp.begin(), m, temp.end());
+    f0_final[i] = temp[temp.size()/2];
+  }
+  f0_final[i] = f0_final[i-1];
+  f0_final[0] = f0_final[1];
+  ```
+
 
 Evaluación *ciega* del estimador
 -------------------------------

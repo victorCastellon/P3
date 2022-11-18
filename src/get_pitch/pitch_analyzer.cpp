@@ -1,6 +1,7 @@
 /// @file
 
 #include <iostream>
+#include <fstream>
 #include <math.h>
 #include "pitch_analyzer.h"
 
@@ -9,21 +10,26 @@ using namespace std;
 /// Name space of UPC
 namespace upc {
   void PitchAnalyzer::autocorrelation(const vector<float> &x, vector<float> &r) const {
-    /// \TODO Compute the autocorrelation
-    /// \FET Autocorrelation computed
-    /// - Inicializamos la autocorrelacion a 0
-    /// - Añadimos el producto
-    /// - Dividimos por la duración
-    ///
-    /// *** TACHAAAAAN ***
-    for (unsigned int l = 0; l < r.size(); ++l) {	
-    	r[l] = 0;
-     	for(unsigned int n = l; n < x.size(); n++){
-      	r[l] += x[n]*x[n-l]; 
+
+    for (unsigned int l = 0; l < r.size(); ++l) {
+  		/// \TODO Compute the autocorrelation r[l]
+
+      /** 
+       * \DONE Autocorrelation computated.
+       * - Autocorrelation set to 0.
+       * - Autocorrelation acumulated for all the signal.
+       * - Autocorrelation divided by length.
+      */
+
+      r[l] = 0;
+      for (unsigned int n = l; n < x.size(); n++){
+        r[l] += x[n]*x[n-l];
       }
-    	r[l] /= x.size();}
-		  if (r[0] == 0.0F) //to avoid log() and divide zero 
-     		r[0] = 1e-10;
+      r[l] /= x.size();
+    }
+
+    if (r[0] == 0.0F) //to avoid log() and divide zero 
+      r[0] = 1e-10; 
   }
 
   void PitchAnalyzer::set_window(Window win_type) {
@@ -35,10 +41,12 @@ namespace upc {
     switch (win_type) {
     case HAMMING:
       /// \TODO Implement the Hamming window
-      /// \FET
-      for(i=0;i<frameLen;i++){
-        window[i]=a0 - a1*cos((2*M_PI*i)/(frameLen-1));
-      }
+        for(unsigned int i=0; i<frameLen; i++){
+          window[i] = 0.53836 - 0.46164*cos(2*M_PI*i/(frameLen - 1)); 
+        }
+      /** 
+       * \DONE Hamming window implemented
+      */
       break;
     case RECT:
     default:
@@ -62,18 +70,33 @@ namespace upc {
     /// \TODO Implement a rule to decide whether the sound is voiced or not.
     /// * You can use the standard features (pot, r1norm, rmaxnorm),
     ///   or compute and use other ones.
-    /** \DONE Para que un sonido sea considerado sonoro decimos que se debe cumplir una de estas condiciones:
-              - Potencia < -73 dB
-              - Relación R[1]/R[0] < 0,53
-              - Relación R[Npitch]/R[0] < 0,37
+    
+    if(rmaxnorm>umaxnorm && r1norm > r1thr && pot > powthr) return false; //Autocorrelación en el candidato a pitch.
+    return true; //Considera que todas las tramas son sordas.
+
+    /** 
+     * \DONE Criteria for differencing between voiced/unvoiced established
+     * It has been considered the autocorrelation at long term, the relation R(1)/R(0) and the power.
     */
-   	//return pot < -73 or r1norm < 0.53 or rmaxnorm < 0.37;
-    return pot < -73 or r1norm < 0.53 or rmaxnorm < umaxnorm;
   }
 
   float PitchAnalyzer::compute_pitch(vector<float> & x) const {
+    //Compute pitch calcula la autocorrelación
     if (x.size() != frameLen)
       return -1.0F;
+
+    //Frame center-clipping
+    float max = *std::max_element(x.begin(), x.end());
+    for(int i = 0; i < (int)x.size(); i++) {
+      if(abs(x[i]) < cclip) {
+        x[i] = 0.0F;
+      }
+    }
+
+    //Frame normalization
+    max = *std::max_element(x.begin(), x.end());
+    for (int i = 0; i < (int)x.size(); i++)
+      x[i] /= max;
 
     //Window input frame
     for (unsigned int i=0; i<x.size(); ++i)
@@ -91,29 +114,35 @@ namespace upc {
 	/// Choices to set the minimum value of the lag are:
 	///    - The first negative value of the autocorrelation.
 	///    - The lag corresponding to the maximum value of the pitch.
-  /// In either case, the lag should not exceed that of the minimum value of the pitch.
-  /// \FET
     ///	   .
-    for(iR=iRMax=r.begin()+npitch_min;iR<r.begin()+npitch_max;iR++){
-   	  if(*iR>*iRMax) iRMax=iR;
-  	}
+	/// In either case, the lag should not exceed that of the minimum value of the pitch.
 
-    unsigned int lag = iRMax - r.begin();
+    for(iR = iRMax =  r.begin() + npitch_min; iR < r.begin() + npitch_max; iR++){ // The maximum has to be located between the minimum and maximum pitch, so it is a reasonable value.
+      // begin() is used to return an iterator pointing to the first element of the vector container
+      if(*iR > * iRMax) iRMax = iR;
+    }
+    unsigned int lag = iRMax - r.begin(); // Cálculo del desplazamiento del pico
 
-    float pot = 10 * log10(r[0]);
+    /** 
+      * \DONE Lag of the maximum value computed
+      * - Iteration through the autocorrelation's vector.
+      * - Selection of the highest value while iterating.
+      * - Difference between the highest value's position and the initial position.
+    */
+
+    float pot = 10 * log10(r[0]); 
 
     //You can print these (and other) features, look at them using wavesurfer
     //Based on that, implement a rule for unvoiced
     //change to #if 1 and compile
-    #if 0
-      if (r[0] > 0.0F)
-        cout << pot << '\t' << r[1]/r[0] << '\t' << r[lag]/r[0] << endl;
-    #endif
-    	//false si es sonora --> devolvemos la frequencia correspondiente al max de la autoorrelacion
-    	//true si es sorda
+#if 0
+    if (r[0] > 0.0F)
+      cout << pot << '\t' << r[1]/r[0] << '\t' << r[lag]/r[0] << endl;
+#endif
+    
     if (unvoiced(pot, r[1]/r[0], r[lag]/r[0]))
-     	return 0; //indica trama sorda.
-   	else
-      return (float) samplingFreq/(float) lag; //trama sonora, devolvemos la frecuencia de pitch.
- 	}
+      return 0;
+    else
+      return (float) samplingFreq/(float) lag;
+  }
 }

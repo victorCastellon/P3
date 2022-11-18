@@ -1,6 +1,5 @@
-import matplotlib.pyplot as plt
 import numpy as np
-import matplotlib.mlab as mlab
+import matplotlib.pyplot as plt
 
 f0 = np.loadtxt("prueba.f0", dtype=float)
 f0ref = np.loadtxt("prueba.f0ref", dtype=float)
@@ -8,23 +7,15 @@ f0ref = np.loadtxt("prueba.f0ref", dtype=float)
 fm = 200/3
 time = np.arange(0,len(f0)).astype(float)/fm
 
-plt.subplot(121)
-plt.title("Calculated Pitch")
-plt.plot(time, f0)
-plt.axis([0,3,0,500])
-plt.grid(True)
-plt.xlabel('Time (s)')
-plt.ylabel('Frequency (Hz)')
+fig, axs = plt.subplots(1, 1)
+axs.plot(time, f0ref, 'r', label='Pitch referencia')
+axs.plot(time, f0, 'b', label='Pitch estimado')
+axs.set_xlim((time[0], time[-1]))
+axs.set_xlabel('Tiempo [s]')
+axs.set_ylabel('Pitch [Hz]')
+axs.set_title('Comparación de pitch')
+axs.grid(which='both', color='#777777', linestyle=':', linewidth=0.5)
 
-plt.subplot(122)
-plt.title("Reference Pitch")
-plt.plot(time, f0ref)
-plt.axis([0,3,0,500])
-plt.grid(True)
-plt.xlabel('Time (s)')
-plt.ylabel('Frequency (Hz)')
-
+fig.tight_layout()
+plt.legend()
 plt.show()
-
-
-
