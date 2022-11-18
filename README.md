@@ -68,7 +68,7 @@ Ejercicios básicos
      
    * Implemente la regla de decisión sonoro o sordo e inserte el código correspondiente.
    
-          La regla de decisión se ha basado en 3 parámetros: la autocorrelación, la relación R(1)/R(0) y el valor de la potencia.
+     La regla de decisión se ha basado en 3 parámetros: la autocorrelación, la relación R(1)/R(0) y el valor de la potencia.
 
       ```c++
       if(rmaxnorm>umaxnorm && r1norm > r1thr && pot > powthr) return false;
