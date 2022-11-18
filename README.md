@@ -14,18 +14,19 @@ Ejercicios básicos
   `get_pitch`.
 
    * Complete el cálculo de la autocorrelación e inserte a continuación el código correspondiente.
-   ```c++
-	void PitchAnalyzer::autocorrelation(const vector<float> &x, vector<float> &r) const {
-		for (unsigned int l = 0; l < r.size(); ++l) {	
-			r[l] = 0;
-			for(unsigned int n = l; n < x.size(); n++){
-				r[l] += x[n]*x[n-l]; 
-			}
-			r[l] /= x.size();}
-			if (r[0] == 0.0F) //to avoid log() and divide zero 
-			r[0] = 1e-10; 
-		}
-   ```
+      ```c++
+      for (unsigned int l = 0; l < r.size(); ++l) {
+        r[l] = 0;
+        for (unsigned int n = l; n < x.size(); n++){
+          r[l] += x[n]*x[n-l];
+        }
+        r[l] /= x.size();
+      }
+
+      if (r[0] == 0.0F) //to avoid log() and divide zero 
+        r[0] = 1e-10; 
+      }
+      ```
 
    * Inserte una gŕafica donde, en un *subplot*, se vea con claridad la señal temporal de un segmento de
      unos 30 ms de un fonema sonoro y su periodo de pitch; y, en otro *subplot*, se vea con claridad la
@@ -38,6 +39,7 @@ Ejercicios básicos
 
    * Determine el mejor candidato para el periodo de pitch localizando el primer máximo secundario de la
      autocorrelación. Inserte a continuación el código correspondiente.
+     
      Como se puede observar en la imagen superior, el mejor candidato para el periodo de pitch es 4.8125ms. Este valor puede localizarse perfectamente en ambos dominios, pues en la gráfica temporal se aprecia claramente que cada periodo ocupa aproximadamente 5s, y en el dominio de la autocorrelación se distingue claramente el máximo, obteniendo el valor gracias al código realizado con Python mostrado a continuación.
 
      Código utilizado para el cálculo de la autocorrelación y su máximo fuera del origen.
@@ -66,17 +68,13 @@ Ejercicios básicos
      
    * Implemente la regla de decisión sonoro o sordo e inserte el código correspondiente.
    
-   Para que un sonido sea considerado sonoro decimos que se debe cumplir una de estas condiciones:
-   
-   + Potencia < -73 dB
-   + Relación R[1]/R[0] < 0,53
-   + Relación R[Npitch]/R[0] < 0,37
+          La regla de decisión se ha basado en 3 parámetros: la autocorrelación, la relación R(1)/R(0) y el valor de la potencia.
 
-    ```c++          
-	bool PitchAnalyzer::unvoiced(float pot, float r1norm, float rmaxnorm) const {
-		return pot < -73 or r1norm < 0.53 or rmaxnorm < umaxnorm;
-	}
-    ```
+      ```c++
+      if(rmaxnorm>umaxnorm && r1norm > r1thr && pot > powthr) return false;
+      return true;
+      ```
+    
    * Puede serle útil seguir las instrucciones contenidas en el documento adjunto `código.pdf`.
 
 - Una vez completados los puntos anteriores, dispondrá de una primera versión del estimador de pitch. El 
