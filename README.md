@@ -38,15 +38,15 @@ Ejercicios básicos
 
    * Determine el mejor candidato para el periodo de pitch localizando el primer máximo secundario de la
      autocorrelación. Inserte a continuación el código correspondiente.
+    
      ```c++		
-    for(iR=iRMax=r.begin()+npitch_min;iR<r.begin()+npitch_max;iR++){
-   	  if(*iR>*iRMax) iRMax=iR;
-  	}
-
-    unsigned int lag = iRMax - r.begin();
-
-    float pot = 10 * log10(r[0]);
+	for(iR=iRMax=r.begin()+npitch_min;iR<r.begin()+npitch_max;iR++){
+		if(*iR>*iRMax) iRMax=iR;
+	}
+	unsigned int lag = iRMax - r.begin();
+	float pot = 10 * log10(r[0]);
      ```
+     
    * Implemente la regla de decisión sonoro o sordo e inserte el código correspondiente.
    
    Para que un sonido sea considerado sonoro decimos que se debe cumplir una de estas condiciones:
@@ -54,10 +54,11 @@ Ejercicios básicos
    + Potencia < -73 dB
    + Relación R[1]/R[0] < 0,53
    + Relación R[Npitch]/R[0] < 0,37
+
     ```c++          
-  bool PitchAnalyzer::unvoiced(float pot, float r1norm, float rmaxnorm) const {
-    return pot < -73 or r1norm < 0.53 or rmaxnorm < umaxnorm;
-  }
+	bool PitchAnalyzer::unvoiced(float pot, float r1norm, float rmaxnorm) const {
+		return pot < -73 or r1norm < 0.53 or rmaxnorm < umaxnorm;
+	}
     ```
    * Puede serle útil seguir las instrucciones contenidas en el documento adjunto `código.pdf`.
 
