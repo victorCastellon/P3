@@ -38,7 +38,7 @@ Ejercicios básicos
 
    La siguiente imagen ha sido generada con el siguiente script [plot_autocorrelation.py](plot_autocorrelation.py).
 
-     <img src="imgs/autocorrelation.jpg" width="640" align="center">
+      <img src="imgs/autocorrelation.jpg" width="640" align="center">
   
    * Determine el mejor candidato para el periodo de pitch localizando el primer máximo secundario de la
      autocorrelación. Inserte a continuación el código correspondiente.
@@ -85,8 +85,6 @@ Ejercicios básicos
 		en esta práctica es de 15 ms.
 
         <img src="imgs/analisis.png" width="640" align="center">
-
-        <img src="imgs/wave.png" width="640" align="center">
        
         Las gráficas hacen referencia a:
         + al nivel de potencia de la señal (r[0])
